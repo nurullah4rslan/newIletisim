@@ -13,8 +13,17 @@ import ROUTES from '../Configs/routes';
 import {DrawerActions} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
+import {
+  Token,
+  MyId,
+  MySection,
+  Name,
+  PersonType,
+} from '../Redux/Actions/loginAction';
 export default function DrawerContents(props) {
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
+  const dispatch = useDispatch();
   return (
     <View style={{backgroundColor: 'white', flex: 1}}>
       <DrawerContentScrollView>
@@ -48,7 +57,7 @@ export default function DrawerContents(props) {
               color: 'black',
               padding: 5,
             }}>
-            {Logins.name}
+            {state.name}
           </Text>
         </View>
       </DrawerContentScrollView>
@@ -85,6 +94,11 @@ export default function DrawerContents(props) {
                   {
                     text: 'Evet',
                     onPress: async () => {
+                      dispatch(Token(null));
+                      dispatch(MySection(null));
+                      dispatch(MyId(null));
+                      dispatch(Name(null));
+                      dispatch(PersonType(null));
                       props.navigation.navigate(ROUTES.EXIT);
                       await AsyncStorage.setItem('accessToken', null);
                     },

@@ -8,15 +8,18 @@ import DrawerNavigator from './DrawerNavigator';
 import {useSelector} from 'react-redux';
 import GroupProfile from '../Screens/GroupProfile/index';
 import UserProfile from '../Screens/UserProfile/index';
+import SectionDetail from '../Screens/SectionDetail/index';
+import CommonDetail from '../Screens/CommonDetail/index';
 const Stack = createStackNavigator();
 
 export default function AuthNavigator() {
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
+  console.log('logings---------->', state);
   const token = 'dolu';
   return (
     <Stack.Navigator
       initialRouteName={
-        Logins.accessToken ? ROUTES.DRAWERNAVIGATOR : ROUTES.LOGIN
+        state.accessToken ? ROUTES.DRAWERNAVIGATOR : ROUTES.LOGIN
       }>
       <Stack.Screen
         name={ROUTES.LOGIN}
@@ -55,6 +58,16 @@ export default function AuthNavigator() {
       <Stack.Screen
         name={ROUTES.USER_PROFILE}
         component={UserProfile}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name={ROUTES.SECTION_DETAIL}
+        component={SectionDetail}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name={ROUTES.COMMON_DETAIL}
+        component={CommonDetail}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

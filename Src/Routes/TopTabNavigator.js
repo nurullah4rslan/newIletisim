@@ -9,12 +9,12 @@ import {useSelector} from 'react-redux';
 const Tab = createMaterialTopTabNavigator();
 
 export default function MyTabs() {
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   return (
     <Tab.Navigator
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
+          backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1',
           elevation: 0,
         },
         tabBarLabelStyle: {fontSize: 12},
