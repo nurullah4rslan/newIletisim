@@ -1,4 +1,4 @@
-import {View, Text, Dimensions} from 'react-native';
+import {View, Text, Dimensions, Platform} from 'react-native';
 import React, {useState, useEffect} from 'react';
 import styles from './styles';
 import {useSelector} from 'react-redux';
@@ -7,7 +7,7 @@ import ROUTES from '../../Configs/routes';
 import {networkPaths, axiosApiInstance as axios} from '@service';
 export default function UserProfile(props, route) {
   const {navigation} = props;
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const [user, setUser] = useState([]);
@@ -22,13 +22,13 @@ export default function UserProfile(props, route) {
           console.log('responseJson.data', responseJson.data);
           setUser(responseJson.data.user[0]);
           setBolum(responseJson.data.bolum_adi[0]);
-          setName(responseJson.data.user[0].name)
+          setName(responseJson.data.user[0].name);
         } else {
           console.warn('first');
         }
       })
       .catch(error => {
-        console.error(error, 'ERROR');
+        console.log(error, 'ERROR');
       });
   };
   useEffect(() => {
@@ -39,10 +39,16 @@ export default function UserProfile(props, route) {
     <View
       style={[
         styles.Container,
-        {backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1'},
+        {backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1'},
       ]}>
       <Header head_title={'Profil'} onpress={() => navigation.goBack()} />
-      <View style={{height: windowHeight * 0.2}}></View>
+      <View
+        style={{
+          height:
+            Platform.OS === 'android'
+              ? windowHeight * 0.125
+              : windowHeight * 0.07,
+        }}></View>
       <View
         style={{
           position: 'absolute',
@@ -53,7 +59,7 @@ export default function UserProfile(props, route) {
         }}>
         <View
           style={{
-            backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
+            backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1',
             width: windowHeight * 0.15,
             height: windowHeight * 0.15,
             borderRadius: windowHeight * 0.1,

@@ -21,7 +21,8 @@ import {
   MyId,
   MySection,
   Name,
-  Type,
+  PersonType,
+  AdvisoryId,
 } from '../../Redux/Actions/loginAction';
 import {SafeAreaView} from 'react-native-safe-area-context';
 // import DeviceInfo from 'react-native-device-info';
@@ -64,8 +65,6 @@ export default function LoginScreen(props) {
   //     message: notification.body,
   //   });
   // };
-
-  const [uniqueId, setUniqueId] = useState('');
 
   // DeviceInfo.getUniqueId().then(uniqueId => {
   //   // iOS: "FCDBD8EF-62FC-4ECB-B2F5-92C9E79AC7F9"
@@ -113,8 +112,6 @@ export default function LoginScreen(props) {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const Login = async () => {
-    console.log('uniqueId', uniqueId);
-
     if (user === '' || password === '') {
       Alert.alert('Uyarı!', 'Boş bırakılamaz', [
         {
@@ -140,18 +137,20 @@ export default function LoginScreen(props) {
             const id = response.id;
             const names = response.name;
             const type = response.type;
+            const advisoryId = response.danisman_id;
             dispatch(Token(token));
             dispatch(MySection(section));
             dispatch(MyId(id));
             dispatch(Name(names));
-            dispatch(Type(type));
+            dispatch(PersonType(type));
+            dispatch(AdvisoryId(advisoryId));
             navigation.navigate(ROUTES.DRAWERNAVIGATOR);
           } else {
             Alert.alert('Yanlış kullanıcı adı veya şifre');
           }
         })
         .catch(error => {
-          console.error(error, 'ERROR');
+          console.log(error, 'ERROR');
           if (JSON.stringify(error).split('"')[3] == 'Network Error') {
             Alert.alert(
               'Uyarı!',
