@@ -57,13 +57,17 @@ export async function notificationListeners() {
   });
 
   messaging().onNotificationOpenedApp(remoteMessage => {
+    const newMessage = remoteMessage.data.conversation_id;
     console.log(
       'Notification caused app to open from background state:',
-      remoteMessage,
+      newMessage,
     );
-    NavigationService.navigate(ROUTES.HOME, {
-      data: remoteMessage,
-    });
+    setTimeout(() => {
+      NavigationService.navigate(ROUTES.MESSAGE, {
+        message_id: newMessage,
+        chat_name: remoteMessage.notification.title,
+      });
+    }, 1200);
   });
 
   // Check whether an initial notification is available
