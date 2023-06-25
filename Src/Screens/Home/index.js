@@ -12,55 +12,64 @@ import MessageList from '../../Components/messageList';
 import ROUTES from '../../Configs/routes';
 import {networkPaths, axiosApiInstance as axios} from '@service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {useSelector} from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import Menu from '../../Components/menu';
 
 export default function Home(props) {
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const {navigation} = props;
   const [message, setMessage] = useState([]);
-  const [open, setOpen] = useState(false);
+  const dispatch = useDispatch();
+  const Advisory = async () => {
+    axios
+      .get(networkPaths.SINGLE_CHAT + state.advisoryId)
+      .then(async function (responseJson) {
+        navigation.navigate(ROUTES.MESSAGE, {
+          message_id: responseJson.data.conversation_id,
+          chat_name: responseJson.data.receiver_name,
+          type: '1',
+        });
+      })
+      .catch(error => {
+        console.error(error, 'ERROR----1');
+      });
+  };
+
   const [refreshing, setRefreshing] = useState(false);
   const [dataIsFinished, setDataIsFinished] = useState(false);
   let refresingForAxios = false;
-  console.log('Login', Logins)
+  console.log('Login', state);
   const Message = async () => {
     axios
       .get(networkPaths.MESSAGE_LIST)
       .then(async function (responseJson) {
+        console.log('responseJson.data', responseJson.data.conversations);
         setRefreshing(false);
         setMessage(responseJson.data.conversations);
+        if (!responseJson.data.conversations) {
+          dispatch(Token(null));
+          dispatch(MySection(null));
+          dispatch(MyId(null));
+          dispatch(Name(null));
+          dispatch(PersonType(null));
+          navigation.navigate(ROUTES.EXIT);
+        }
       })
       .catch(error => {
+        dispatch(Token(null));
+        dispatch(MySection(null));
+        dispatch(MyId(null));
+        dispatch(Name(null));
+        dispatch(PersonType(null));
+        navigation.navigate(ROUTES.EXIT);
         console.error(error, 'ERROR');
       });
   };
   useEffect(() => {
     Message();
   }, []);
-
-  const Advisory = async () => {
-    axios
-      .get(networkPaths.ADVISORY)
-      .then(async function (responseJson) {
-        axios
-          .get(networkPaths.SINGLE_CHAT + responseJson.data.list.id)
-          .then(async function (responseJson) {
-            navigation.navigate(ROUTES.MESSAGE, {
-              message_id: responseJson.data.conversation_id,
-              chat_name: responseJson.data.receiver_name,
-            });
-          })
-          .catch(error => {
-            console.error(error, 'ERROR');
-          });
-      })
-      .catch(error => {
-        console.error(error, 'ERROR');
-      });
-  };
 
   const renderItem = item => {
     return (
@@ -71,12 +80,13 @@ export default function Home(props) {
             id: item.ders_id,
             message_id: item.id,
             chat_name: item.chat_name,
+            type: item.type,
           })
         }
-        active={item.type == '0' ? (Logins.type == '1' ? true : false) : true}
+        active={item.type === 0 ? (state.personType == 1 ? true : false) : true}
         profileOnpress={() => {
-          item.type == '0'
-            ? Logins.type == '1' &&
+          item.type === 0
+            ? state.personType == 1 &&
               navigation.navigate(ROUTES.GROUP_PROFILE, {
                 id: item.ders_id,
                 message_id: item.id,
@@ -87,7 +97,7 @@ export default function Home(props) {
                 .then(async function (responseJson) {
                   console.log('responseJson.data', responseJson.data.list);
                   {
-                    Logins.myId == responseJson.data.list[0].id
+                    state.myId == responseJson.data.list[0].id
                       ? navigation.navigate(ROUTES.USER_PROFILE, {
                           id: responseJson.data.list[1].id,
                           message_id: responseJson.data.list[1].id,
@@ -117,7 +127,7 @@ export default function Home(props) {
     <View
       style={[
         styles.Container,
-        {backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1'},
+        {backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1'},
       ]}>
       <View
         style={{
@@ -142,118 +152,32 @@ export default function Home(props) {
               }}
             />
           }
-        />
-      </View>
-      {/* <View
-        style={{
-          width: windowHeight * 0.43,
-          height: windowHeight * 0.83,
-          position: 'absolute',
-          alignItems: 'flex-end',
-          justifyContent: 'flex-end',
-        }}>
-        <TouchableOpacity
-          style={{
-            width: 60,
-            height: 60,
-            backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
-            borderRadius: 60,
-            borderWidth: 5,
-            borderColor: 'white',
-            shadowOffset: {width: 5, height: 5},
-            shadowColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
-            elevation: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={() => setOpen(!open)}>
-          <Image
-            source={require('../../Assets/Images/plus.png')}
-            style={
-              open
-                ? {
-                    height: 30,
-                    width: 30,
-                    tintColor: 'white',
-                    transform: [{rotate: '45deg'}],
-                  }
-                : {height: 30, width: 30, tintColor: 'white'}
-            }
-          />
-        </TouchableOpacity>
-      </View>
-      {open && (
-        <View
-          style={{
-            width: windowHeight * 0.25,
-            height: windowHeight * 0.81,
-            position: 'absolute',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-          }}>
-          <TouchableOpacity
-            style={{
-              width: 60,
-              height: 60,
-              backgroundColor: '#547A58',
-              borderRadius: 60,
-              borderWidth: 5,
-              borderColor: 'white',
-              shadowOffset: {width: 8, height: 8},
-              shadowColor: '#547A58',
-              elevation: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() => navigation.navigate(ROUTES.ACADEMIC_LIST)}>
-            <Image
-              source={require('../../Assets/Images/classroom.png')}
-              style={{height: 25, width: 25, tintColor: 'white'}}
-            />
-            <Text style={{fontSize: 5, fontWeight: 'bold', color: 'white'}}>
-              Akademisyenler
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-      {open && Logins.type == '0' && (
-        <View
-          style={{
-            width: windowHeight * 0.38,
-            height: windowHeight * 0.67,
-            position: 'absolute',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-          }}>
-          <TouchableOpacity
-            style={{
-              width: 60,
-              height: 60,
-              backgroundColor: '#A86464',
-              borderRadius: 60,
-              borderWidth: 5,
-              borderColor: 'white',
-              shadowOffset: {width: 5, height: 5},
-              shadowColor: '#A86464',
-              elevation: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() => Advisory()}>
-            <Image
-              source={require('../../Assets/Images/advisory.png')}
+          ListEmptyComponent={
+            <View
               style={{
-                height: 30,
-                width: 30,
-                tintColor: 'white',
-              }}
-            />
-            <Text style={{fontSize: 5, fontWeight: 'bold', color: 'white'}}>
-              Danışman
-            </Text>
-          </TouchableOpacity>
+                backgroundColor: 'white',
+                flex: 1,
+                width: '100%',
+                borderTopRightRadius: 40,
+                borderTopLeftRadius: 40,
+                marginTop: 20,
+                paddingVertical: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <Text style={{fontWeight: 'bold'}}>
+                Bu alanda mesajınız bulunmamaktadır.
+              </Text>
+            </View>
+          }
+        />
+        <View style={{width: windowWidth * 0.95, alignItems: 'flex-end'}}>
+          <Menu
+            onpress={() => navigation.navigate(ROUTES.ACADEMIC_LIST)}
+            Advisory={Advisory}
+          />
         </View>
-      )} */}
+      </View>
     </View>
   );
 }

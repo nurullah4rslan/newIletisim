@@ -4,12 +4,11 @@ import styles from './styles';
 import Academiclist from '../../Components/academicsList';
 import ROUTES from '../../Configs/routes';
 import {networkPaths, axiosApiInstance as axios} from '@service';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 import {useSelector} from 'react-redux';
 import Header from '../../Components/header';
+import {SafeAreaView} from 'react-native-safe-area-context';
 export default function AcademicList(props) {
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const {navigation} = props;
@@ -27,7 +26,7 @@ export default function AcademicList(props) {
         }
       })
       .catch(error => {
-        console.error(error, 'ERROR');
+        console.log(error, 'ERROR');
       });
   };
   useEffect(() => {
@@ -58,8 +57,8 @@ export default function AcademicList(props) {
             });
         }}
         profileOnpress={() => {
-          item.type == '0'
-            ? Logins.type == '1' &&
+          item.type === 0
+            ? state.personType == 1 &&
               navigation.navigate(ROUTES.GROUP_PROFILE, {
                 id: item.ders_id,
                 message_id: item.id,
@@ -78,7 +77,7 @@ export default function AcademicList(props) {
     <View
       style={[
         styles.Container,
-        {backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1'},
+        {backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1'},
       ]}>
       <Header
         head_title={'Akademisyen Listesi'}
@@ -87,12 +86,11 @@ export default function AcademicList(props) {
       <View
         style={{
           backgroundColor: 'white',
+          flex: 1,
           width: '100%',
           borderTopRightRadius: 40,
           borderTopLeftRadius: 40,
-          marginTop: 20,
-          paddingVertical: 10,
-          height: windowHeight * 0.93,
+          paddingVertical: 20,
         }}>
         <FlatList
           data={message}
@@ -110,7 +108,7 @@ export default function AcademicList(props) {
                   paddingVertical: 10,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  height: windowHeight*0.6,
+                  height: windowHeight * 0.6,
                 }}>
                 <Text style={{fontWeight: 'bold'}}>
                   Bu alanda mesajınız bulunmamaktadır.

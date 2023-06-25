@@ -9,7 +9,7 @@ import MessageList from '../../Components/messageList';
 import Academiclist from '../../Components/academicsList';
 export default function GroupProfile(props) {
   const {navigation, route} = props;
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   const [list, setList] = useState(false);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
@@ -23,7 +23,7 @@ export default function GroupProfile(props) {
         setList(responseJson.data.list);
       })
       .catch(error => {
-        console.error(error, 'ERROR');
+        console.log(error, 'ERROR');
       });
   };
   useEffect(() => {
@@ -53,8 +53,8 @@ export default function GroupProfile(props) {
             });
         }}
         profileOnpress={() => {
-          item.type == '0'
-            ? Logins.type == '1' &&
+          item.type === 0
+            ? state.personType == 1 &&
               navigation.navigate(ROUTES.GROUP_PROFILE, {
                 id: item.ders_id,
                 message_id: item.id,
@@ -73,15 +73,15 @@ export default function GroupProfile(props) {
     <View
       style={[
         styles.Container,
-        {backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1'},
+        {
+          backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1',
+        },
       ]}>
       <Header head_title={'Grup Detay'} onpress={() => navigation.goBack()} />
       <View
         style={{
-          position: 'absolute',
           alignItems: 'center',
           width: '100%',
-          top: windowHeight * 0.05,
         }}>
         <Image
           source={require('../../Assets/Images/fu2.png')}
@@ -101,7 +101,7 @@ export default function GroupProfile(props) {
         <View style={{width: '100%', padding: windowHeight * 0.05}}>
           <Text
             style={{
-              color: Logins.type == '0' ? '#E90348' : '#01AAC1',
+              color: state.personType == 0 ? '#E90348' : '#01AAC1',
               fontSize: 20,
               fontWeight: 'bold',
             }}>
@@ -115,7 +115,7 @@ export default function GroupProfile(props) {
             backgroundColor: 'white',
             padding: 10,
             height: windowHeight * 0.5,
-            borderColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
+            borderColor: state.personType == 0 ? '#E90348' : '#01AAC1',
             borderWidth: 1,
           }}>
           <Text
@@ -126,7 +126,7 @@ export default function GroupProfile(props) {
               paddingVertical: 10,
               borderBottomWidth: 1,
               marginBottom: 20,
-              borderColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
+              borderColor: state.personType == 0 ? '#E90348' : '#01AAC1',
             }}>
             Kişiler
           </Text>

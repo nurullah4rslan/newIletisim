@@ -13,15 +13,15 @@ import MessageList from '../../Components/messageList';
 import ROUTES from '../../Configs/routes';
 import {networkPaths, axiosApiInstance as axios} from '@service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Menu from '../../Components/menu';
 import {useSelector} from 'react-redux';
 
 export default function Groups(props) {
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const {navigation} = props;
   const [message, setMessage] = useState([]);
-  const [activity, setActivity] = useState(true);
   const [open, setOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [dataIsFinished, setDataIsFinished] = useState(false);
@@ -30,15 +30,11 @@ export default function Groups(props) {
     axios
       .get(networkPaths.GROUP_LIST)
       .then(async function (responseJson) {
-        if (responseJson.data.conversations) {
-          setMessage(responseJson.data.conversations);
-          setRefreshing(false);
-        } else {
-          setActivity(false);
-        }
+        setMessage(responseJson.data.conversations);
+        setRefreshing(false);
       })
       .catch(error => {
-        console.error(error, 'ERROR');
+        console.log(error, 'ERROR');
       });
   };
   useEffect(() => {
@@ -56,10 +52,10 @@ export default function Groups(props) {
             chat_name: item.chat_name,
           })
         }
-        active={item.type == '0' ? (Logins.type == '1' ? true : false) : true}
+        active={item.type === 0 ? (state.personType == 1 ? true : false) : true}
         profileOnpress={() => {
-          item.type == '0'
-            ? Logins.type == '1' &&
+          item.type === 0
+            ? state.personType == 1 &&
               navigation.navigate(ROUTES.GROUP_PROFILE, {
                 id: item.ders_id,
                 message_id: item.id,
@@ -70,7 +66,7 @@ export default function Groups(props) {
                 .then(async function (responseJson) {
                   console.log('responseJson.data', responseJson.data.list);
                   {
-                    Logins.myId == responseJson.data.list[0].id
+                    state.myId == responseJson.data.list[0].id
                       ? navigation.navigate(ROUTES.USER_PROFILE, {
                           id: responseJson.data.list[1].id,
                           message_id: responseJson.data.list[1].id,
@@ -84,7 +80,7 @@ export default function Groups(props) {
                   }
                 })
                 .catch(error => {
-                  console.error(error, 'ERROR');
+                  console.log(error, 'ERROR');
                 });
         }}
       />
@@ -103,11 +99,11 @@ export default function Groups(props) {
             });
           })
           .catch(error => {
-            console.error(error, 'ERROR');
+            console.log(error, 'ERROR');
           });
       })
       .catch(error => {
-        console.error(error, 'ERROR');
+        console.log(error, 'ERROR');
       });
   };
   const onRefresh = () => {
@@ -120,168 +116,57 @@ export default function Groups(props) {
     <View
       style={[
         styles.Container,
-        {backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1'},
+        {backgroundColor: state.personType == 0 ? '#E90348' : '#01AAC1'},
       ]}>
-      {activity ? (
-        <View
-          style={{
-            backgroundColor: 'white',
-            flex: 1,
-            width: '100%',
-            borderTopRightRadius: 40,
-            borderTopLeftRadius: 40,
-            marginTop: 20,
-            paddingVertical: 10,
-          }}>
-          <FlatList
-            data={message}
-            renderItem={({item}) => renderItem(item)}
-            refreshControl={
-              <RefreshControl
-                colors={['red']}
-                tintColor={'red'}
-                refreshing={refreshing}
-                onRefresh={() => {
-                  onRefresh();
-                }}
-              />
-            }
-          />
-        </View>
-      ) : (
-        <View
-          style={{
-            backgroundColor: 'white',
-            flex: 1,
-            width: '100%',
-            borderTopRightRadius: 40,
-            borderTopLeftRadius: 40,
-            marginTop: 20,
-            paddingVertical: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <Text style={{fontWeight: 'bold'}}>
-            Bu alanda mesajınız bulunmamaktadır.
-          </Text>
-        </View>
-      )}
       <View
         style={{
-          width: windowHeight * 0.43,
-          height: windowHeight * 0.83,
-          position: 'absolute',
-          alignItems: 'flex-end',
-          justifyContent: 'flex-end',
+          backgroundColor: 'white',
+          flex: 1,
+          width: '100%',
+          borderTopRightRadius: 40,
+          borderTopLeftRadius: 40,
+          marginTop: 20,
+          paddingVertical: 10,
         }}>
-        <TouchableOpacity
-          style={{
-            width: 60,
-            height: 60,
-            backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
-            borderRadius: 60,
-            borderWidth: 5,
-            borderColor: 'white',
-            shadowOffset: {width: 5, height: 5},
-            shadowColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
-            elevation: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={() => setOpen(!open)}>
-          <Image
-            source={require('../../Assets/Images/plus.png')}
-            style={
-              open
-                ? {
-                    height: 30,
-                    width: 30,
-                    tintColor: 'white',
-                    transform: [{rotate: '45deg'}],
-                  }
-                : {height: 30, width: 30, tintColor: 'white'}
-            }
-          />
-        </TouchableOpacity>
-      </View>
-      {open ? (
-        <View
-          style={{
-            width: windowHeight * 0.25,
-            height: windowHeight * 0.81,
-            position: 'absolute',
-            alignItems: 'flex-end',
-            justifyContent: 'flex-end',
-          }}>
-          <TouchableOpacity
-            style={{
-              width: 60,
-              height: 60,
-              backgroundColor: '#547A58',
-              borderRadius: 60,
-              borderWidth: 5,
-              borderColor: 'white',
-              shadowOffset: {width: 8, height: 8},
-              shadowColor: '#547A58',
-              elevation: 10,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-            onPress={() => navigation.navigate(ROUTES.ACADEMIC_LIST)}>
-            <Image
-              source={require('../../Assets/Images/classroom.png')}
-              style={{height: 25, width: 25, tintColor: 'white'}}
+        <FlatList
+          data={message}
+          renderItem={({item}) => renderItem(item)}
+          refreshControl={
+            <RefreshControl
+              colors={['red']}
+              tintColor={'red'}
+              refreshing={refreshing}
+              onRefresh={() => {
+                onRefresh();
+              }}
             />
-            <Text style={{fontSize: 5, fontWeight: 'bold', color: 'white'}}>
-              Akademisyenler
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View></View>
-      )}
-      {open ? (
-        Logins.type == '0' && (
-          <View
-            style={{
-              width: windowHeight * 0.38,
-              height: windowHeight * 0.67,
-              position: 'absolute',
-              alignItems: 'flex-end',
-              justifyContent: 'flex-end',
-            }}>
-            <TouchableOpacity
+          }
+          ListEmptyComponent={
+            <View
               style={{
-                width: 60,
-                height: 60,
-                backgroundColor: '#A86464',
-                borderRadius: 60,
-                borderWidth: 5,
-                borderColor: 'white',
-                shadowOffset: {width: 5, height: 5},
-                shadowColor: '#A86464',
-                elevation: 10,
+                backgroundColor: 'white',
+                flex: 1,
+                width: '100%',
+                borderTopRightRadius: 40,
+                borderTopLeftRadius: 40,
+                marginTop: 20,
+                paddingVertical: 10,
                 alignItems: 'center',
                 justifyContent: 'center',
-              }}
-              onPress={() => Advisory()}>
-              <Image
-                source={require('../../Assets/Images/advisory.png')}
-                style={{
-                  height: 30,
-                  width: 30,
-                  tintColor: 'white',
-                }}
-              />
-              <Text style={{fontSize: 5, fontWeight: 'bold', color: 'white'}}>
-                Danışman
+              }}>
+              <Text style={{fontWeight: 'bold'}}>
+                Bu alanda mesajınız bulunmamaktadır.
               </Text>
-            </TouchableOpacity>
-          </View>
-        )
-      ) : (
-        <View></View>
-      )}
+            </View>
+          }
+        />
+        <View style={{width: windowWidth * 0.95, alignItems: 'flex-end'}}>
+          <Menu
+            onpress={() => navigation.navigate(ROUTES.ACADEMIC_LIST)}
+            Advisory={Advisory}
+          />
+        </View>
+      </View>
     </View>
   );
 }
