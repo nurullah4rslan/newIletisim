@@ -5,16 +5,21 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Modal,
+  Button,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {useSelector} from 'react-redux';
+import PropTypes from 'prop-types';
+import {networkPaths, axiosApiInstance as axios} from '@service';
 
 function chatList(props) {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
-  const {Logins} = useSelector(state => state);
-  const myId = Logins.myId;
-  const {text, user_id, user_name} = props;
+  const state = useSelector(state => state);
+  const myId = state.myId;
+  const [open, setOpen] = useState(false);
+  const {text, user_id, user_name, image} = props;
   return myId == user_id ? (
     <View>
       <View
@@ -31,7 +36,7 @@ function chatList(props) {
             borderRadius: 15,
             maxWidth: windowWidth * 0.75,
           }}>
-          <Text>{text}</Text>
+          <Text style={{color: 'black'}}>{text}</Text>
         </View>
         <Image
           source={require('../Assets/Images/triangle.png')}
@@ -74,11 +79,66 @@ function chatList(props) {
             borderRadius: 15,
           }}>
           <Text style={{color: 'green', fontWeight: 'bold'}}>{user_name}</Text>
-          <Text>{text}</Text>
+          {image && (
+            <TouchableOpacity
+              style={{marginVertical: 10}}
+              onPress={() => {
+                setOpen(true);
+              }}>
+              <Image
+                source={{uri: networkPaths.BASE_URL + image}}
+                style={{
+                  width: windowWidth * 0.6,
+                  aspectRatio: 1.7,
+                  resizeMode: 'cover', //cover dene
+                }}
+              />
+            </TouchableOpacity>
+          )}
+          <Text style={{color: 'black'}}>{text}</Text>
         </View>
+        <Modal
+          visible={open}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => {
+            setOpen(false);
+          }}>
+          <View
+            onTouchStart={() => {
+              setOpen(false);
+            }}
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            }}>
+            <Image
+              source={{uri: networkPaths.BASE_URL + image}}
+              style={{
+                width: windowWidth,
+                marginVertical: 10,
+                aspectRatio: 1.3,
+                resizeMode: 'contain',
+              }}
+            />
+          </View>
+        </Modal>
       </View>
     </View>
   );
 }
 
 export default chatList;
+chatList.propTypes = {
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  text: PropTypes.string,
+  user_id: PropTypes.string,
+  user_name: PropTypes.string,
+};
+
+chatList.defaultProps = {
+  style: {},
+  text: '',
+};

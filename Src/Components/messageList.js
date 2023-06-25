@@ -1,10 +1,11 @@
 import {StyleSheet, Text, View, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {useSelector} from 'react-redux';
+import PropTypes from 'prop-types';
 
 function messageList(props) {
   const {title, id, onpress, profileOnpress, active} = props;
-  const {Logins} = useSelector(state => state);
+  const state = useSelector(state => state);
   return (
     <TouchableOpacity onPress={onpress}>
       <View
@@ -34,10 +35,11 @@ function messageList(props) {
                   height: 60,
                   width: 60,
                   borderRadius: 30,
-                  shadowOpacity: {width: 5, height: 5},
+                  shadowOffset: {width: 5, height: 5},
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
+                  backgroundColor:
+                    state.personType == 0 ? '#E90348' : '#01AAC1',
                 }}
                 onPress={profileOnpress}>
                 <Text
@@ -51,10 +53,11 @@ function messageList(props) {
                   height: 60,
                   width: 60,
                   borderRadius: 30,
-                  shadowOpacity: {width: 5, height: 5},
+                  shadowOffset: {width: 5, height: 5},
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: Logins.type == '0' ? '#E90348' : '#01AAC1',
+                  backgroundColor:
+                    state.personType == 0 ? '#E90348' : '#01AAC1',
                 }}
                 onPress={profileOnpress}>
                 <Text
@@ -66,7 +69,7 @@ function messageList(props) {
           </View>
           <View style={{paddingLeft: 10}}>
             <View>
-              <Text style={{fontWeight: 'bold', color: 'Black'}}>{title}</Text>
+              <Text style={{fontWeight: 'bold', color: 'black'}}>{title}</Text>
             </View>
           </View>
         </View>
@@ -88,5 +91,21 @@ function messageList(props) {
 }
 
 export default messageList;
+messageList.propTypes = {
+  style: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
+  title: PropTypes.string,
+  id: PropTypes.string,
+  onpress: PropTypes.func,
+  profileOnpress: PropTypes.func,
+  active: PropTypes.bool,
+};
+
+messageList.defaultProps = {
+  style: {},
+  title: '',
+  onpress: () => {},
+  profileOnpress: () => {},
+  active: false,
+};
 
 const styles = StyleSheet.create({});
