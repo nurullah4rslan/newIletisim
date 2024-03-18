@@ -1,5 +1,6 @@
 //baseurl
-export const BASE_URL = 'https://06db-2a09-bac5-58b2-769-00-bd-3d.eu.ngrok.io';
+export const BASE_URL = 'https://testiletisim.firat.edu.tr';
+// export const BASE_URL = 'https://d0b1-78-135-94-41.eu.ngrok.io';
 
 //LOGIN
 export const LOGIN_URL = `/api/login`;
@@ -13,6 +14,7 @@ export const GROUP_LIST = 'api/user/groupchats';
 export const GROUP_CHAT = '/api/user/groupchat/';
 export const SINGLE_CHAT = '/api/user/singlechat/';
 export const SEND_CHAT = '/api/user/message/';
+export const EVERYONE_CHAT = '/api/user/update_everyone_chat/';
 
 //Academic List
 export const ACADEMIC_LIST = '/api/user/academics';

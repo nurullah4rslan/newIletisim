@@ -249,12 +249,12 @@ export default function Message({navigation, route}) {
                 value={message}
                 onChangeText={onChangeText => setMessage(onChangeText)}
               />
-              <TouchableOpacity>
+              {/* <TouchableOpacity>
                 <Image
                   source={require('../../Assets/Images/documant.png')}
                   style={{height: 20, width: 20}}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <TouchableOpacity
               onPress={() => {
